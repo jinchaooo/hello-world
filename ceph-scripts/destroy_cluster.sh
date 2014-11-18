@@ -23,7 +23,7 @@ ceph-deploy purge $1
 ceph-deploy purgedata $1
 
 # delete all files except sh scripts in current folder
-# ls|grep -v '.sh'|xargs rm -fr
+##ls|grep -v '.sh'|xargs rm -fr
 rm -f *.keyring
 rm -f ceph.log
 rm -f ceph.conf
