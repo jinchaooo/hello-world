@@ -3,7 +3,7 @@
 if [ "$#" -lt 2 ]
 then
   echo "usage: $0 mon_name osd1_name:data_dir:journal_dev [osd2_name...]"
-  echo "example: $0 monitor OSD1:/mnt/hybridfs1:/dev/sdb1 OSD2:/mnt/hybridfs:/dev/sdd1"
+  echo "example: $0 monitor OSD1:/mnt/osd1:/dev/sdb1 OSD2:/mnt/osd2:/dev/sdb1"
   exit 0
 fi
 
@@ -23,4 +23,7 @@ ceph-deploy purge $1
 ceph-deploy purgedata $1
 
 # delete all files except sh scripts in current folder
-ls|grep -v '.sh'|xargs rm -fr
+# ls|grep -v '.sh'|xargs rm -fr
+rm -f *.keyring
+rm -f ceph.log
+rm -f ceph.conf
