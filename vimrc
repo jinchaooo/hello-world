@@ -87,8 +87,8 @@ nnoremap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 inoremap jj <esc>
 nnoremap LL <C-w>l 
 nnoremap HH <C-w>h 
-nnoremap JJ <C-w>j 
-nnoremap KK <C-w>k 
+nnoremap JJ <C-f> 
+nnoremap KK <C-b> 
 nnoremap ms :cs find s <C-R>=expand("<cword>")<CR><CR>
 nnoremap mg :cs find g <C-R>=expand("<cword>")<CR><CR>
 nnoremap mc :cs find c <C-R>=expand("<cword>")<CR><CR>
