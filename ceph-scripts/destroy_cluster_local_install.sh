@@ -15,13 +15,17 @@ do
     continue
   fi
   ceph-deploy purge ${osd%%":"*}
-  ##ceph-deploy purgedata ${osd%%":"*}
-  ##data_dir=`echo $osd|cut -d":" -f2`
-  ##ssh root@${osd%%":"*} "cd $data_dir;rm -fr *"
+  src_dir="/home/jinc/ceph"
+  ssh root@${osd%%":"*} "cd $src_dir;make uninstall"
+  ceph-deploy purgedata ${osd%%":"*}
+  data_dir=`echo $osd|cut -d":" -f2`
+  ssh root@${osd%%":"*} "cd $data_dir;rm -fr *"
 done
 
 ceph-deploy purge $1
-##ceph-deploy purgedata $1
+cd /home/jinc/ceph
+sudo make uninstall
+ceph-deploy purgedata $1
 
 # delete all files except sh scripts in current folder
 ##ls|grep -v '.sh'|xargs rm -fr
