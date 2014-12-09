@@ -59,7 +59,8 @@ ExternalProject_add(
     PREFIX ${PREFIX}
     # cmake's use of curl doesn't work right on macs, so we use a DOWNLOAD_COMMAND instead
     # be warned... cmake's arg parsing is really simplistic: it just splits on spaces regardless of quotes.
-    DOWNLOAD_COMMAND curl -L https://github.com/palominolabs/protobuf-util/archive/${PROTOBUFUTIL_VERSION}.tar.gz -o protobufutil-src.tar.gz && openssl md5 protobufutil-src.tar.gz | grep -q ${PROTOBUFUTIL_MD5} && mkdir -p protobufutil && tar -xz --strip-components 1 -C protobufutil -f protobufutil-src.tar.gz
+    # DOWNLOAD_COMMAND curl -L https://github.com/palominolabs/protobuf-util/archive/${PROTOBUFUTIL_VERSION}.tar.gz -o protobufutil-src.tar.gz && openssl md5 protobufutil-src.tar.gz | grep -q ${PROTOBUFUTIL_MD5} && mkdir -p protobufutil && tar -xz --strip-components 1 -C protobufutil -f protobufutil-src.tar.gz
+    DOWNLOAD_COMMAND openssl md5 protobufutil-src.tar.gz | grep -q ${PROTOBUFUTIL_MD5} && mkdir -p protobufutil && tar -xz --strip-components 1 -C protobufutil -f protobufutil-src.tar.gz
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND cmake -DBUILD_FOR_ARM=${BUILD_FOR_ARM} -DBUILD_PIC=${BUILD_PIC}
     INSTALL_COMMAND ""
@@ -72,6 +73,7 @@ ExternalProject_add(
     kinetic-proto
     PREFIX ${PREFIX}
     DOWNLOAD_COMMAND curl -L https://github.com/Seagate/kinetic-protocol/archive/${KINETIC_PROTO_VERSION}.tar.gz -o kinetic-proto.tar.gz && openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
+    DOWNLOAD_COMMAND openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

@@ -13,7 +13,11 @@
 .deps
 kinetic_client_test
 kinetic_integration_test
-/vendor
+#/vendor
+vendor/*
+!vendor/src/
+vendor/src/*
+!vendor/src/*.gz
 kinetic_cpp_client.build
 kinetic_cpp_client.xcodeproj
 kinetic_client.proto
