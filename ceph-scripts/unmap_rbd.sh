@@ -1,3 +1,3 @@
 #!/bin/bash
-rbd unmap /dev/rbd/rbd/foo 
-rbd rm foo
+sudo rbd unmap /dev/rbd/rbd/jrbd 
+sudo rbd rm jrbd

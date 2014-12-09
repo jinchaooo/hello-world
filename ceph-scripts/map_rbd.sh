@@ -5,5 +5,5 @@ then
   echo "example: $0 10240 192.168.35.182"
   exit 0
 fi
-rbd create foo --size $1 -m $2 -k /etc/ceph/ceph.client.admin.keyring
-rbd map foo --pool rbd --name client.admin -m $2 -k /etc/ceph/ceph.client.admin.keyring
+sudo rbd create jrbd --size $1 -m $2 
+sudo rbd map jrbd --pool rbd --name client.admin -m $2 
