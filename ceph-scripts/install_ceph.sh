@@ -28,6 +28,7 @@ fi
 if [ "$1" == "i" -o "$1" == "mi" -o "$1" == "cmi" ]
 then
 sudo make install
+sudo mkdir -p /etc/ceph
 sudo mkdir -p /var/lib/ceph/osd
 sudo mkdir -p /var/lib/ceph/bootstrap-osd
 sudo cp src/upstart/ceph*.conf /etc/init/
