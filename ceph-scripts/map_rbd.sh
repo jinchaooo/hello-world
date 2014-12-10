@@ -1,9 +1,26 @@
 #!/bin/bash
-if [ "$#" -lt 2 ]
+if [ $# -lt 1 ]
 then
-  echo "usage: $0 rbd_size(MB) mon_ip"
-  echo "example: $0 10240 192.168.35.182"
+  echo "usage: $0 rbd_size(MB) [mon_ip]"
+  echo "example: $0 10240 [192.168.35.182]"
   exit 0
 fi
-sudo rbd create jrbd --size $1 -m $2 
-sudo rbd map jrbd --pool rbd --name client.admin -m $2 
+
+if [ $# -eq 1 -a "$1" = "u" ]
+then 
+  echo "unmap and delete rbd image jrbd"
+  sudo rbd unmap /dev/rbd/rbd/jrbd
+  rbd rm jrbd
+  exit 0
+fi
+
+if [ $# -eq 2 ]
+then
+  echo "create and map rbd image jrbd"
+  rbd create --pool rbd --size $1 --order 22 --image-format 1 --stripe-unit 4194304 --stripe-count 1 -m $2 jrbd 
+  sudo rbd --pool rbd -m $2 map jrbd
+else
+  echo "create and map rbd image jrbd"
+  rbd create --pool rbd --size $1 --order 22 --image-format 1 --stripe-unit 4194304 --stripe-count 1 jrbd
+  sudo rbd --pool rbd map jrbd
+fi
