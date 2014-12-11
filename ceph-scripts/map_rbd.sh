@@ -9,7 +9,9 @@ fi
 if [ $# -eq 1 -a "$1" = "u" ]
 then 
   echo "unmap and delete rbd image jrbd"
-  sudo rbd unmap /dev/rbd/rbd/jrbd
+  mapped=`rbd showmapped`
+  devid=`echo $mapped | awk '{for(i=1;i<=NF;i++) if($i=="jrbd") {i=i+2;print $i;break;}}'`
+  sudo rbd unmap $devid
   rbd rm jrbd
   exit 0
 fi
