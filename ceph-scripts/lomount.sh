@@ -36,6 +36,8 @@ then
       MKFS="mkfs.xfs -f"
       ;;
   esac 
+else
+  exit 0
 fi
 
 if mountpoint -q /mnt/os
