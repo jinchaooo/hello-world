@@ -72,7 +72,7 @@ set(KINETIC_PROTO_MD5 "f5ff4cbea0e909362c46032fb3775c49")
 ExternalProject_add(
     kinetic-proto
     PREFIX ${PREFIX}
-    DOWNLOAD_COMMAND curl -L https://github.com/Seagate/kinetic-protocol/archive/${KINETIC_PROTO_VERSION}.tar.gz -o kinetic-proto.tar.gz && openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
+    # DOWNLOAD_COMMAND curl -L https://github.com/Seagate/kinetic-protocol/archive/${KINETIC_PROTO_VERSION}.tar.gz -o kinetic-proto.tar.gz && openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
     DOWNLOAD_COMMAND openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ""
