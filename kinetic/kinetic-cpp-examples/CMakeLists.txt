@@ -9,8 +9,9 @@ set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_SOURCE_DIR}/src/main/generated)
 
 include(ExternalProject)
 
-option(USE_LOCAL_KINETIC_CLIENT "Uses the kinetic client at the KINETIC_CLIENT_PATH variable instead of downloading library from Git" off)
+option(USE_LOCAL_KINETIC_CLIENT "Uses the kinetic client at the KINETIC_CLIENT_PATH variable instead of downloading library from Git" on)
 if(USE_LOCAL_KINETIC_CLIENT)
+    set(KINETIC_CLIENT_PATH "${CMAKE_BINARY_DIR}/../kinetic_cpp_client")
 else(USE_LOCAL_KINETIC_CLIENT)
     set(KINETIC_CLIENT_PATH "${CMAKE_BINARY_DIR}/vendor/src/kinetic_cpp_client")
 
