@@ -75,3 +75,10 @@ add_example_target(write_file_blocking_threads false)
 add_example_target(dump_keyspace false)
 add_example_target(copydrive false)
 add_example_target(bench_write_nonblocking false)
+#add_example_target(bench_multi_write_nonblocking false)
+add_executable(bench_multi_write_nonblocking
+    src/bench_multi_write_nonblocking.cc
+    src/kv_bench.cc)
+target_link_libraries(bench_multi_write_nonblocking ${LIBRARY_DEPENDENCIES})
+add_dependencies(bench_multi_write_nonblocking kinetic_cpp_client)
+
