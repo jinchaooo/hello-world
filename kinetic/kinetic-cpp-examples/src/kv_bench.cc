@@ -20,9 +20,11 @@ using kinetic::Status;
 using kinetic::KineticRecord;
 using kinetic::PutCallbackInterface;
 using kinetic::KineticStatus;
+using kinetic::SimpleCallbackInterface;
 
 using std::make_shared;
 using std::unique_ptr;
+using std::shared_ptr;
 
 // callback for put ops
 class PutCallback : public PutCallbackInterface {
@@ -41,6 +43,24 @@ class PutCallback : public PutCallbackInterface {
     }
   private:
     int* remaining_;
+};
+
+class DeleteCallback : public SimpleCallbackInterface {
+  public:
+    DeleteCallback(int* remaining) : remaining_(remaining) {};
+    void Success() {
+      printf(".");
+      fflush(stdout);
+      (*remaining_)--;
+    }
+
+    void Failure(KineticStatus error) {
+      printf("Error: %d %s\n", static_cast<int>(error.statusCode()), error.message().c_str());
+      exit(1);
+    }
+  private:
+    int* remaining_;
+
 };
 
 int KVBencher::init_write(uint32_t count, 
@@ -64,7 +84,7 @@ int KVBencher::init_write(uint32_t count,
   auto callback = make_shared<PutCallback>(&remaining);
 
   uint32_t small = 0, big = 0, mod = max_order - min_order + 1;
-  uint64_t total_bytes = 0, total_write_bytes, total_read_bytes;
+  uint64_t total_bytes = 0, total_write_bytes = 0, total_read_bytes = 0;
 
   // record the time
   timeval begint, endt;
@@ -112,9 +132,9 @@ int KVBencher::init_write(uint32_t count,
 
   total_write_bytes = total_bytes;
   total_read_bytes = 0;
-  double ti_sec;
-  double oprate;
-  double datarate;
+  double ti_sec = 0;
+  double oprate = 0;
+  double datarate = 0;
   ti_sec = endt.tv_sec - begint.tv_sec;
   ti_sec += (endt.tv_usec - begint.tv_usec) / (1000.0 * 1000.0);
   std::cout << std::endl << "Done!" << std::endl;
@@ -124,7 +144,8 @@ int KVBencher::init_write(uint32_t count,
   std::cout << "Total write bytes: " << total_write_bytes << std::endl;
   std::cout << "Total read bytes: " << total_read_bytes << std::endl;
   datarate = total_write_bytes / ti_sec;
-  std::cout << "Throughput is: "<< datarate << " bytes per sec" << std::endl;
+  datarate = datarate / 1024;
+  std::cout << "Throughput is: "<< datarate << " KB per sec" << std::endl;
 
   return 0;
 }
@@ -139,8 +160,39 @@ int KVBencher::random_bench(uint32_t count,
 {
   return 0;
 }
+
 void KVBencher::cleanup(bool fetch)
 {
+  if (fetch)
+    if (fetch_bench_metadata())
+      return;
+
+  int remaining = 0;
+  fd_set read_fds, write_fds;
+  int num_fds = 0;
+  auto callback = make_shared<DeleteCallback>(&remaining);
+  
+  for (uint32_t i = 0; i < object_count; ++i) {
+    std::stringstream tss;
+    tss<<bench_pref<<"_"<<i;
+    std::string key(tss.str());
+
+    remaining++;
+    conn->Delete(key, "", kinetic::WriteMode::IGNORE_VERSION,
+        callback, kinetic::PersistMode::WRITE_BACK);
+    conn->Run(&read_fds, &write_fds, &num_fds);
+  }
+
+  // FIXME delete the metadata here
+
+  // wait for the ops to finish
+  while (remaining > 0) {
+    while (select(num_fds + 1, &read_fds, &write_fds, NULL, NULL) <= 0);
+    conn->Run(&read_fds, &write_fds, &num_fds);
+  }
+
+  std::cout << std::endl << "Cleanup done!" << std::endl;
+
 }
 
 int KVBencher::fetch_bench_metadata()
