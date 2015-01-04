@@ -2,5 +2,6 @@
 
 int main()
 {
-  std::cout << "test_a includes common.h, which defines VAR" << std::endl;
+  int v = VAR;
+  std::cout << "test_a includes common.h, which defines VAR = " << v << std::endl;
 }

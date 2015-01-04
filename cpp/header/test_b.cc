@@ -1,9 +1,10 @@
 #include "common.h"
 
-#define VAR
-#define VAR
+//#define VAR 2
+//#define VAR 3
 
 int main()
 {
-  std::cout << "test_b includes common.h, which defines VAR" << std::endl;
+  int v = VAR;
+  std::cout << "test_b includes common.h, which defines VAR = " << v << std::endl;
 }

@@ -3,6 +3,6 @@
 
 #include <iostream>
 
-#define VAR
+#define VAR 1
 
 #endif
