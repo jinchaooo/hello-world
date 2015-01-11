@@ -111,4 +111,11 @@ int main()
   std::cout << "main(): construct hhhh by =std::move(hh)\n";
   hello hhhh = std::move(hh);
   std::cout << "main(): *hhhh.a_ = " << *hhhh.a_ << std::endl;
+
+  /**
+   * compiler will call move constructor
+   */
+  std::cout << "main(): construct hhhhh by std::make_shared\n";
+  std::shared_ptr<hello> phhhhh = std::make_shared<hello>(std::move(hhh));
+  std::cout << "main(): phhhhh->a_ = " << *(phhhhh->a_) << std::endl;
 }
