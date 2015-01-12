@@ -29,3 +29,6 @@ ise
 firmware_update
 dump_keyspace
 copydrive
+bench_write_nonblocking
+bench_mix_size_nonblocking
+bench_multi_client_nonblocking

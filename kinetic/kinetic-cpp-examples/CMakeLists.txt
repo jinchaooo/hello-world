@@ -10,8 +10,10 @@ set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_SOURCE_DIR}/src/main/generated)
 include(ExternalProject)
 
 option(USE_LOCAL_KINETIC_CLIENT "Uses the kinetic client at the KINETIC_CLIENT_PATH variable instead of downloading library from Git" on)
+
+# KINETIC_CLIENT_PATH should be linked to the actual folder of the kinetic_cpp_client
 if(USE_LOCAL_KINETIC_CLIENT)
-    set(KINETIC_CLIENT_PATH "${CMAKE_BINARY_DIR}/../kinetic_cpp_client")
+    set(KINETIC_CLIENT_PATH "${CMAKE_BINARY_DIR}/kinetic_cpp_client")
 else(USE_LOCAL_KINETIC_CLIENT)
     set(KINETIC_CLIENT_PATH "${CMAKE_BINARY_DIR}/vendor/src/kinetic_cpp_client")
 
@@ -75,10 +77,15 @@ add_example_target(write_file_blocking_threads false)
 add_example_target(dump_keyspace false)
 add_example_target(copydrive false)
 add_example_target(bench_write_nonblocking false)
-#add_example_target(bench_multi_write_nonblocking false)
-add_executable(bench_multi_write_nonblocking
-    src/bench_multi_write_nonblocking.cc
-    src/kv_bench.cc)
-target_link_libraries(bench_multi_write_nonblocking ${LIBRARY_DEPENDENCIES})
-add_dependencies(bench_multi_write_nonblocking kinetic_cpp_client)
 
+add_executable(bench_mix_size_nonblocking
+    src/bench_mix_size_nonblocking.cc
+    src/kv_bench.cc)
+target_link_libraries(bench_mix_size_nonblocking ${LIBRARY_DEPENDENCIES})
+add_dependencies(bench_mix_size_nonblocking kinetic_cpp_client)
+
+add_executable(bench_multi_client_nonblocking
+    src/bench_multi_client_nonblocking.cc
+    src/kv_bench.cc)
+target_link_libraries(bench_multi_client_nonblocking ${LIBRARY_DEPENDENCIES})
+add_dependencies(bench_multi_client_nonblocking kinetic_cpp_client)
