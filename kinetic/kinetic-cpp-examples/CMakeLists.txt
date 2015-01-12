@@ -11,7 +11,7 @@ include(ExternalProject)
 
 option(USE_LOCAL_KINETIC_CLIENT "Uses the kinetic client at the KINETIC_CLIENT_PATH variable instead of downloading library from Git" on)
 
-# KINETIC_CLIENT_PATH should be linked to the actual folder of the kinetic_cpp_client
+# kinetic_cpp_client here should be a link to the actual client library folder
 if(USE_LOCAL_KINETIC_CLIENT)
     set(KINETIC_CLIENT_PATH "${CMAKE_BINARY_DIR}/kinetic_cpp_client")
 else(USE_LOCAL_KINETIC_CLIENT)
