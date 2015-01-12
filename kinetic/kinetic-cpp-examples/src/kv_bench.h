@@ -7,8 +7,6 @@
 #include <stdint.h>
 #include <vector>
 #include <boost/scoped_ptr.hpp>
-//#include "common/ceph_context.h"
-//#include "os/ObjectStore.h"
 
 #include <sys/fcntl.h>
 #include <sys/mman.h>
@@ -32,6 +30,9 @@ class KVBencher {
     }
     int init_write(uint32_t count,
         uint32_t min_order, uint32_t max_order, bool do_cleanup=false);
+    int init_write_noprint(uint32_t count, 
+        uint32_t min_order, uint32_t max_order, bool do_cleanup,
+        uint64_t* total_bytes, double* ti_sec);
     int sequential_bench(uint32_t write_percentage=0);
     int random_bench(uint32_t count, 
         const std::string& rule, uint32_t write_percentage=0);

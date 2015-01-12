@@ -16,7 +16,8 @@
 kinetic::ConnectionOptions options;
 
 void bench_thread(uint32_t idx, uint32_t count, 
-    uint32_t minorder, uint32_t maxorder, bool cleanup)
+    uint32_t minorder, uint32_t maxorder, bool cleanup,
+    uint64_t* total_bytes, double* ti_sec)
 {
   // create the connection with kv server
   kinetic::KineticConnectionFactory kcf = 
@@ -34,7 +35,8 @@ void bench_thread(uint32_t idx, uint32_t count,
   ss << idx;
   std::string bench_name(ss.str());
   KVBencher bencher(nbc, bench_name);    
-  bencher.init_write(count, minorder, maxorder, cleanup);
+  bencher.init_write_noprint(count, minorder, maxorder, cleanup, 
+      total_bytes, ti_sec);
 }
 
 int main(int argc, char* argv[])
@@ -87,9 +89,13 @@ int main(int argc, char* argv[])
 
     // each thread creates a connection with kv server
     std::vector<std::unique_ptr<std::thread>> threads;
+    uint64_t total_bytes_thread[thread_num];
+    double ti_sec_thread[thread_num];
+
     for (uint32_t i = 0; i < thread_num; i++) {
       std::unique_ptr<std::thread> t(new std::thread(bench_thread,
-            i, count, minorder, maxorder, do_cleanup));
+            i, count, minorder, maxorder, do_cleanup,
+            &total_bytes_thread[i], &ti_sec_thread[i]));
       threads.push_back(std::move(t));
     }
 
@@ -98,6 +104,24 @@ int main(int argc, char* argv[])
       (*c)->join();
 
     std::cout << "All bench threads finished\n";
+    double oprate_all_threads = 0;
+    double datarate_all_threads = 0;
+    
+    for (uint32_t i = 0; i < thread_num; i++) {
+      std::cout << "\nThread " << i << ":\n";
+      std::cout << "Execution time is: " << ti_sec_thread[i] << " secs\n";
+      double oprate = count / ti_sec_thread[i];
+      std::cout << "Operations per sec is: "<< oprate << "\n";
+      std::cout << "Write bytes: "<< total_bytes_thread[i] << "\n";
+      double datarate = total_bytes_thread[i] / ti_sec_thread[i];
+      datarate = datarate / 1024;
+      std::cout << "Throughput is: "<< datarate << " KB per sec\n";
+      oprate_all_threads += oprate;
+      datarate_all_threads += datarate;
+    }
+    std::cout << "\nAggragate Performance:\n";
+    std::cout << "Operations per sec is: "<< oprate_all_threads << "\n";
+    std::cout << "Throughput is: "<< datarate_all_threads << " KB per sec\n";
 
   } else if (prefix == "sequential") {
     std::cout << "Not supported yet\n";

@@ -150,6 +150,85 @@ int KVBencher::init_write(uint32_t count,
   return 0;
 }
 
+int KVBencher::init_write_noprint(uint32_t count, 
+    uint32_t min_order, uint32_t max_order, bool do_cleanup,
+    uint64_t* total_bytes, double* ti_sec)
+{
+  if (min_order == 0 || max_order == 0)
+    return 1;
+  if (total_bytes == NULL || ti_sec == NULL)
+    return 1;
+
+  if (max_order < min_order) {
+    uint32_t t = max_order;
+    max_order = min_order;
+    min_order = t;
+  }
+  object_count = count;
+  min_size_order = min_order;
+  max_size_order = max_order;
+  object_sizes.clear();
+
+  int remaining = 0;
+  fd_set read_fds, write_fds;
+  int num_fds = 0;
+  auto callback = make_shared<PutCallback>(&remaining);
+
+  uint32_t small = 0; 
+  uint32_t big = 0; 
+  uint32_t mod = max_order - min_order + 1;
+  *total_bytes = 0;
+
+  // record the time
+  timeval begint, endt;
+  gettimeofday(&begint, NULL);
+
+  for (uint32_t i = 0; i < object_count; ++i) {
+    uint32_t order = min_order + (rand() % mod);
+    if (order < 20)
+      ++small;
+    else
+      ++big;
+    uint64_t bsize = (uint64_t) 1 << order;
+    object_sizes.push_back(bsize);
+
+    std::stringstream tss;
+    tss<<bench_pref<<"_"<<i;
+    std::string key(tss.str());
+
+    // value of the put ops
+    std::string value(bsize, 'a');
+    auto record = make_shared<KineticRecord>(value, "", "", 
+        Message_Algorithm_SHA1);
+    
+    remaining++;
+    conn->Put(key, "", kinetic::WriteMode::IGNORE_VERSION, record,
+        callback, kinetic::PersistMode::WRITE_BACK);
+    conn->Run(&read_fds, &write_fds, &num_fds);
+
+    *total_bytes += bsize;
+  }
+
+  // wait for the ops to finish
+  while (remaining > 0) {
+    while (select(num_fds + 1, &read_fds, &write_fds, NULL, NULL) <= 0);
+    conn->Run(&read_fds, &write_fds, &num_fds);
+  }
+  
+  gettimeofday(&endt, NULL);
+
+  if (do_cleanup) {
+    cleanup(false);
+  } else {
+    save_bench_metadata();
+  }
+
+  *ti_sec = endt.tv_sec - begint.tv_sec;
+  *ti_sec += (endt.tv_usec - begint.tv_usec) / (1000.0 * 1000.0);
+
+  return 0;
+}
+
 int KVBencher::sequential_bench(uint32_t write_percentage)
 {
   return 0;
